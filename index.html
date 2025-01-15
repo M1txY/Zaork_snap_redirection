@@ -4,92 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirection Snapchat</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        p {
-            color: #666;
-            font-size: 1rem;
-        }
-
-        .loader {
-            margin-top: 20px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
-</head>
-<body>
-    <h1>Redirection en cours...</h1>
-    <p>Veuillez patienter pendant que nous vous redirigeons.</p>
-    <div class="loader"></div>
-
     <script>
-        function getDeviceType() {
+        // Détection de l'appareil
+        function detectDevice() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            if (/iPhone|iPad|iPod/i.test(userAgent)) {
-                return 'ios';
-            } else if (/Android/i.test(userAgent)) {
+            if (/android/i.test(userAgent)) {
                 return 'android';
-            } else {
-                return 'other';
             }
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return 'ios';
+            }
+            return 'desktop';
         }
 
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+        // Fonction de redirection
+        function redirect() {
+            const params = new URLSearchParams(window.location.search);
+            const snapUrl = params.get('url');
 
-        (function redirectToSnapchat() {
-            const snapUrl = getUrlParameter('url');
             if (!snapUrl) {
-                alert("Aucune URL fournie pour la redirection.");
+                alert("Aucune URL Snapchat fournie.");
                 return;
             }
 
-            const device = getDeviceType();
-            let redirectUrl = '';
+            const device = detectDevice();
+            let redirectUrl;
 
             if (device === 'ios') {
-                redirectUrl = `snapchat://unlock/?type=SNAPCODE&link=${encodeURIComponent(snapUrl)}`;
+                redirectUrl = `snapchat://unlock/?type=SNAPCODE&uuid=${extractUUID(snapUrl)}&metadata=01`;
             } else if (device === 'android') {
-                redirectUrl = `intent://unlock/?type=SNAPCODE&link=${encodeURIComponent(snapUrl)}#Intent;scheme=snapchat;package=com.snapchat.android;end;`;
+                redirectUrl = `intent://unlock/?type=SNAPCODE&uuid=${extractUUID(snapUrl)}&metadata=01#Intent;scheme=snapchat;package=com.snapchat.android;end;`;
             } else {
-                redirectUrl = snapUrl;
+                redirectUrl = snapUrl; // Redirection web pour les navigateurs de bureau
             }
 
-            // Redirection après 2 secondes
+            // Exécuter la redirection après un délai
             setTimeout(() => {
                 window.location.href = redirectUrl;
-            }, 2000);
-        })();
+            }, 500);
+        }
+
+        // Extraire l'UUID de l'URL Snapchat
+        function extractUUID(url) {
+            const match = url.match(/uuid=([a-z0-9]+)/i);
+            return match ? match[1] : '';
+        }
+
+        // Lancer la redirection lorsque la page est chargée
+        document.addEventListener('DOMContentLoaded', redirect);
     </script>
+</head>
+<body>
+    <h1>Redirection en cours...</h1>
+    <p>Veuillez patienter pendant que nous vous redirigeons vers Snapchat.</p>
 </body>
 </html>
