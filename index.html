@@ -6,7 +6,7 @@
     <title>Redirection Snapchat</title>
     <script>
         // Détection de l'appareil
-        function detectDevice() {
+        function getDeviceType() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             if (/android/i.test(userAgent)) {
                 return 'android';
@@ -18,40 +18,34 @@
         }
 
         // Fonction de redirection
-        function redirect() {
+        function redirectToSnapchat() {
             const params = new URLSearchParams(window.location.search);
-            const snapUrl = params.get('url');
+            const uuid = params.get('uuid');
 
-            if (!snapUrl) {
-                alert("Aucune URL Snapchat fournie.");
+            if (!uuid) {
+                alert("Aucun UUID fourni dans l'URL.");
                 return;
             }
 
-            const device = detectDevice();
-            let redirectUrl;
+            const deviceType = getDeviceType();
+            let snapchatUrl;
 
-            if (device === 'ios') {
-                redirectUrl = `snapchat://unlock/?type=SNAPCODE&uuid=${extractUUID(snapUrl)}&metadata=01`;
-            } else if (device === 'android') {
-                redirectUrl = `intent://unlock/?type=SNAPCODE&uuid=${extractUUID(snapUrl)}&metadata=01#Intent;scheme=snapchat;package=com.snapchat.android;end;`;
+            if (deviceType === 'ios') {
+                snapchatUrl = `snapchat://unlock/?type=SNAPCODE&uuid=${uuid}&metadata=01`;
+            } else if (deviceType === 'android') {
+                snapchatUrl = `intent://unlock/?type=SNAPCODE&uuid=${uuid}&metadata=01#Intent;scheme=snapchat;package=com.snapchat.android;end;`;
             } else {
-                redirectUrl = snapUrl; // Redirection web pour les navigateurs de bureau
+                snapchatUrl = `https://www.snapchat.com/unlock/?type=SNAPCODE&uuid=${uuid}&metadata=01`;
             }
 
             // Exécuter la redirection après un délai
             setTimeout(() => {
-                window.location.href = redirectUrl;
+                window.location.href = snapchatUrl;
             }, 500);
         }
 
-        // Extraire l'UUID de l'URL Snapchat
-        function extractUUID(url) {
-            const match = url.match(/uuid=([a-z0-9]+)/i);
-            return match ? match[1] : '';
-        }
-
         // Lancer la redirection lorsque la page est chargée
-        document.addEventListener('DOMContentLoaded', redirect);
+        document.addEventListener('DOMContentLoaded', redirectToSnapchat);
     </script>
 </head>
 <body>
