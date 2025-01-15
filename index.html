@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirection Snapchat</title>
     <script>
-        // Détection de l'appareil
+        
         function getDeviceType() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             if (/android/i.test(userAgent)) {
@@ -17,7 +17,7 @@
             return 'desktop';
         }
 
-        // Fonction de redirection
+        
         function redirectToSnapchat() {
             const params = new URLSearchParams(window.location.search);
             const uuid = params.get('uuid');
@@ -37,14 +37,12 @@
             } else {
                 snapchatUrl = `https://www.snapchat.com/unlock/?type=SNAPCODE&uuid=${uuid}&metadata=01`;
             }
-
-            // Exécuter la redirection après un délai
+            
             setTimeout(() => {
                 window.location.href = snapchatUrl;
             }, 500);
         }
-
-        // Lancer la redirection lorsque la page est chargée
+        
         document.addEventListener('DOMContentLoaded', redirectToSnapchat);
     </script>
 </head>
